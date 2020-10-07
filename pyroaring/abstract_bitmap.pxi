@@ -721,6 +721,29 @@ cdef class AbstractBitMap:
         free(buff)
         return result
 
+    def serialize_frozen(self):
+        """
+        Return the serialization of the bitmap in the frozen format. See FrozenBitmap.frozen_view for the reverse operation.
+
+        >>> bitmap = BitMap([3, 12])
+        >>> length = bitmap.frozen_size()
+        >>> FrozenBitMap.frozen_view(bitmap).serialize_frozen(), length)
+        FrozenBitMap([3, 12])
+        """
+
+        cdef size_t size = croaring.roaring_bitmap_frozen_size_in_bytes(self._c_bitmap)
+        cdef char *buff = <char*>malloc(size)
+        croaring.roaring_bitmap_frozen_serialize(self._c_bitmap, buff)
+        result = buff[:size]
+        free(buff)
+        return result
+
+    def frozen_size(self):
+        """
+        Return the size of the serialization of the bitmap in the frozen format.
+        """
+        cdef size_t size = croaring.roaring_bitmap_frozen_size_in_bytes(self._c_bitmap)
+        return size
 
     @classmethod
     def deserialize(cls, char *buff):

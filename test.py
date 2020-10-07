@@ -602,6 +602,14 @@ class SerializationTest(Util):
         self.assertIsInstance(new_bm, cls2)
         self.assert_is_not(old_bm, new_bm)
 
+    @given(bitmap_cls, hyp_collection)
+    def test_frozen_serialization(self, cls1, values):
+        old_bm = cls1(values)
+        buff = old_bm.serialize_frozen()
+        new_bm = FrozenBitmap.frozen_view(buff, len(buff))
+        self.assertEqual(old_bm, new_bm)
+        self.assert_is_not(old_bm, new_bm)
+
     @given(bitmap_cls, hyp_collection, st.integers(min_value=2, max_value=pickle.HIGHEST_PROTOCOL))
     def test_pickle_protocol(self, cls, values, protocol):
         old_bm = cls(values)
